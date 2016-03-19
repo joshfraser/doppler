@@ -1,0 +1,158 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="libs/pure-min.css">
+  </head>
+  <body>
+
+    <div id='debug'>Debug</div>
+
+    <div id="content">
+      <h1>Motion sensing using the doppler effect</h1>
+      <p>
+        Recently I stumbled upon <a href="http://research.microsoft.com/en-us/um/redmond/groups/cue/publications/guptasoundwavechi2012.pdf">an interesting paper</a> for
+        implementing motion sensing requiring no special hardware, <i>only a speaker and mic</i>! Unfortunately the paper didn't include
+        code to test it, so I decided to reproduce it here on the web!
+      </p>
+
+      <h2>What is the doppler effect?</h2>
+      <p>
+        First of all, what is the doppler effect?
+        The <a href="http://en.wikipedia.org/wiki/Doppler_effect">doppler effect</a> is a physical phenomenom which affects waves in motion.
+        The standard example is the effect on a fire engine siren as it quickly drives
+        past. When it moves <i>towards</i> you the sound waves are compressed, and so the
+        frequency becomes <i>higher</i>, and
+        when it moves <i>away</i> from you the frequency becomes <i>lower</i>.
+      </p>
+      <div id="doppler-video"></div>
+      <p>
+        This phenomenon actually has really wonderful applications in astronomy for figuring the speed
+        at which galaxies are moving towards or away from us by looking at the frequency shift of light,
+        but I digress.
+      </p>
+      <p>
+        Anyway, it's important to realize that the doppler effect would also occur
+        if you were to run towards the siren, rather than the siren moving towards you.
+        We'll use this principle in the next section.
+      </p>
+
+      <h2>Measuring the doppler effect</h2>
+      <p>
+        In order to measure the doppler effect for motion detection on a conventional computer,
+        what you can do is send out a sinusoid at some known (inaudible) frequency, say, 20 kHz.
+        If something is moving in the room, then, after the sinusoid has bounced around on the walls and into the microphone, the
+        sound will shift in frequency. This can be measured by looking at the frequency spectrum
+        in the nearby region of the 20 kHz tone.
+      </p>
+      <div>
+        <canvas id="spectrum" width="700" height="100"></canvas>
+
+        <div id="spectrum-axes">
+          <span class="left-axis">0 kHz</span><span class="right-axis">22 kHz</span>
+        </div>
+      </div>
+      <p>
+        <span class="warn">Note that you'll need to run Chrome with a fairly high speaker-volume for this to work optimally.</span>
+      </p>
+      <p>
+        The frequency spectrum of the microphone input is plotted above. The peak towards the right
+        is due to the 20 kHz tone we're sending out. Try <span data-note="440" class="data-note">whistling</span> to see the spectrum change.
+      </p>
+      <div>
+        <canvas id="spectrum-zoom" width="700" height="100"></canvas>
+        <div id="spectrum-zoom-axes">
+          <span class="left-axis">19 kHz</span> <span class="right-axis">21 kHz</span>
+        </div>
+      </div>
+      <p>
+        Here's a closer look, zooming in on the 20 kHz region.
+        Try moving your hand <i>towards</i>
+        the mic/computer to see the bulge shift to <i>higher</i> frequencies, and
+        <i>away</i> from the computer to see it shift to <i>lower</i> frequencies.
+      </p>
+
+      <h2>Applications</h2>
+      <p>
+        Now for the fun applications!
+      </p>
+
+      <h3>Motion sensing</h3>
+      <p>
+        The most obvious application for this is motion sensing.
+        Below I've calculated the left and right bandwidth of the 20 kHz
+        region (defined as the number of frequencies to the left and right
+        that are within 99.9% in amplitude of the 20 kHz tone).
+        I've then attached their difference to the size of the box.
+      </p>
+      <canvas id="ball" width="700" height="100"></canvas>
+      <p>
+        The effect this produces is that when you move your hand <i>towards</i>
+        the microphone, the box becomes smaller (you're <i>pushing</i>
+        it inwards), and if you move your hand <i>away</i> from the microphone,
+        the box becomes larger (you're <i>pulling</i> it outwards).
+      </p>
+
+      <h3>Scrolling</h3>
+      <div id="scrolling-video"></div>
+      <p>
+        A cool application to motion sensing, as suggested by the
+        <a href="http://research.microsoft.com/en-us/um/redmond/groups/cue/publications/guptasoundwavechi2012.pdf">SoundWave paper</a>,
+        is scrolling (see the video above). Click below to try it out.
+      </p>
+     
+      <p>
+        This implementation doesn't have the double-tap feature for reversing
+        the scrolling-direction, instead it's just using the left and right bandwidth-difference.
+        Thus if you want to scroll down you have to move your hand
+        <i>quickly towards</i> the computer, and <i>slowly away</i> from the computer.
+      </p>
+
+      <h3>Theremin</h3>
+      <div id="theremin-video"></div>
+      <p>
+        We can also create an instrument with this by simply modulating
+        the frequency of some base-tone, say at 440 Hz, based on the
+        difference between the left and right bandwidth!
+      </p>
+      <div id="theremin-btn-container">
+       
+      </div>
+      <p>
+        This is reminiscent of a Theremin, in that you can contol
+        sound by moving your hands in free space, yet different
+        in that the Theremin is able to measure absolute distance from the base,
+        whereas we can only measure relative motion.
+      </p>
+
+      <h2>Library</h2>
+      <p>
+        Did this give you any ideas? I also created <a href="https://github.com/DanielRapp/doppler">a small library</a> to play around with this.
+        Just run
+      </p>
+        <pre><code class="javascript">
+  doppler.init(function(bandwidth) {
+    var diff = bandwidth.left - bandwidth.right;
+  });
+        </code></pre>
+      <p>
+        to start experimenting.
+      </p>
+
+      <div id="author">
+        Written by <a href="https://github.com/DanielRapp">Daniel Rapp</a>.
+        Check out the code for this <a href="https://github.com/DanielRapp/doppler">on Github</a>.
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="libs/data-note.js"></script>
+    <script src="script.js"></script>
+    <script src="viz.js"></script>
+
+  </body>
+</html>

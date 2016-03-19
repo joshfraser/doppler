@@ -13,11 +13,19 @@
     </style>
   </head>
   <body>
+
+    <div id='display'>hello</div>
+
+
     <div id="box"></div>
     <script src="doppler.js"></script>
+
+  
+
     <script>
       window.addEventListener('load', function() {
         window.doppler.init(function(bandwidth) {
+          console.log(bandwidth)
           var threshold = 4;
           if (bandwidth.left > threshold || bandwidth.right > threshold) {
             var scale    = 10;
@@ -26,6 +34,8 @@
             var dimension = (baseSize + scale*diff) + 'px';
             document.getElementById('box').style.width  = dimension;
             document.getElementById('box').style.height = dimension;
+
+            document.getElementById('display').innerHTML = bandwidth.left + " - " + bandwidth.right + " - " + diff;
           }
         });
       });
